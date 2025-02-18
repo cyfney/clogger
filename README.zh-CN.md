@@ -1,8 +1,14 @@
 # CLOG
 
+[![Arduino AVR Build](https://github.com/cyfney/clog/actions/workflows/arduino_avr_build.yml/badge.svg)](https://github.com/cyfney/clog/actions/workflows/arduino_avr_build.yml) [![Arduino AVR Build](https://github.com/cyfney/clog/actions/workflows/arduino_avr_build.yml/badge.svg)](https://github.com/cyfney/clog/actions/workflows/arduino_avr_build.yml)
+
 ## 简介
 
-`clog` 模块是一个专为 Arduino 项目设计的日志记录工具，特别适用于 AVR 和 ESP32 架构。它提供了一种方便的方式来打印带有时间戳、文件名、行号和函数名的日志消息。
+`clog`模块是一个专为 Arduino 项目设计的极为便捷的日志记录工具，适用于 AVR 和 ESP32 架构。其主要目的是为用户提供一种在 Arduino 平台上轻松进行日志记录的方法，使用起来就像使用广为人知的 `printf` 函数一样方便。
+
+在传统的 Arduino 开发中，记录带有详细时间戳、文件名、行号和函数名的信息可能是一个繁琐的过程。然而，使用 `clog` 模块时，用户只需包含 `clog.h` 头文件，然后就可以开始使用 `CLOG` 宏，该宏的行为类似于 printf。这意味着用户可以轻松地格式化并打印日志消息，而无需担心添加时间戳、文件信息等底层的复杂性。
+
+无论你是在调试代码、监控 Arduino 项目的状态，还是只是想跟踪重要事件，`clog` 模块都通过提供一个简单直观的日志记录解决方案来简化这个过程。
 
 ## 安装
 

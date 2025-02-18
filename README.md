@@ -1,8 +1,16 @@
 # CLOG
 
+[![Arduino AVR Build](https://github.com/cyfney/clog/actions/workflows/arduino_avr_build.yml/badge.svg)](https://github.com/cyfney/clog/actions/workflows/arduino_avr_build.yml) [![Arduino AVR Build](https://github.com/cyfney/clog/actions/workflows/arduino_avr_build.yml/badge.svg)](https://github.com/cyfney/clog/actions/workflows/arduino_avr_build.yml)
+
+[中文版](README.zh-CN.md)
+
 ## Introduction
 
-The clog module is a logging utility designed for Arduino projects, specifically tailored for both AVR and ESP32 architectures. It provides a convenient way to print log messages with timestamps, file names, line numbers, and function names.
+The `clog` module is a highly convenient logging utility specifically designed for Arduino projects, catering to both AVR and ESP32 architectures. Its primary goal is to provide users with an effortless way to perform logging tasks on Arduino platforms, making it as easy as using the well-known `printf` function.
+
+In traditional Arduino development, logging information with detailed timestamps, file names, line numbers, and function names can be a cumbersome process. However, with the clog module, users can simply include the `clog.h` header file and start using the `CLOG` macro, which mimics the behavior of `printf`. This means that users can easily format and print log messages without having to worry about the underlying complexity of adding timestamps, file information, etc.
+
+Whether you are debugging your code, monitoring the state of your Arduino project, or simply want to keep track of important events, the `clog` module simplifies the process by providing a straightforward and intuitive logging solution.
 
 ## Installation
 
