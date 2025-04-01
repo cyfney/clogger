@@ -4,9 +4,9 @@
 #define __CLOG_H__
 
 #ifdef ARDUINO_ARCH_ESP32
-#include "clog_esp32.h"
+#include "clogger_esp32.h"
 #else
-#include "clog_avr.h"
+#include "clogger_common.h"
 #endif
 
 #endif

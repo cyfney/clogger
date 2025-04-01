@@ -1,26 +1,26 @@
 #pragma once
 
-#ifndef __CLOG_AVR_H__
-#define __CLOG_AVR_H__
+#ifndef __CLOGGER_COMMON_H__
+#define __CLOGGER_COMMON_H__
 
 #include <Arduino.h>
 #include <WString.h>
 #include <stdarg.h>
 #include <stdio.h>
 
-struct Clog {
+struct Clogger {
   template <typename T, size_t size>
   static constexpr size_t FileNameOffset(const T (&file_path)[size], size_t i = size - 1) {
     static_assert(size > 1, "");
     return file_path[i] == '/' || file_path[i] == '\\' ? i + 1 : (i == 0 ? 0 : FileNameOffset(file_path, i - 1));
   }
 
-  static void Print(const __FlashStringHelper *file_name,
-                    const size_t file_name_begin,
-                    const size_t line_num,
-                    const char *function,
-                    const __FlashStringHelper *fmt,
-                    ...) {
+  static void Log(const __FlashStringHelper *file_name,
+                  const size_t file_name_begin,
+                  const size_t line_num,
+                  const char *function,
+                  const __FlashStringHelper *fmt,
+                  ...) {
     const auto now = millis();
     const uint_fast16_t millis = now % 1000;
     const uint_fast8_t seconds = now / 1000 % 60;
@@ -43,6 +43,10 @@ struct Clog {
     Serial.print(function);
     Serial.print(F("] "));
 
+    if (nullptr == fmt) {
+      return;
+    }
+
     va_list args;
     va_start(args, fmt);
     const auto size = vsnprintf_P(nullptr, 0, reinterpret_cast<const char *>(fmt), args);
@@ -58,7 +62,8 @@ struct Clog {
   }
 };  // namespace clog
 
-#define CLOG(fmt, ...) \
-  Clog::Print(F(__FILE__), Clog::FileNameOffset(__FILE__), __LINE__, __FUNCTION__, F("" fmt), ##__VA_ARGS__)
+#define CLOG(fmt, ...) Clogger::Log(F(__FILE__), Clogger::FileNameOffset(__FILE__), __LINE__, __FUNCTION__, F("" fmt), ##__VA_ARGS__)
+
+#define CLOG_TRACE() Clogger::Log(F(__FILE__), Clogger::FileNameOffset(__FILE__), __LINE__, __FUNCTION__, nullptr)
 
 #endif

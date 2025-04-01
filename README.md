@@ -1,24 +1,24 @@
 # CLOG
 
-[![Arduino AVR Build](https://github.com/cyfney/clog/actions/workflows/arduino_avr_build.yml/badge.svg)](https://github.com/cyfney/clog/actions/workflows/arduino_avr_build.yml) [![Arduino AVR Build](https://github.com/cyfney/clog/actions/workflows/arduino_avr_build.yml/badge.svg)](https://github.com/cyfney/clog/actions/workflows/arduino_avr_build.yml)
+[![Arduino AVR Build](https://github.com/cyfney/clogger/actions/workflows/arduino_avr_build.yml/badge.svg)](https://github.com/cyfney/clogger/actions/workflows/arduino_avr_build.yml) [![Arduino AVR Build](https://github.com/cyfney/clogger/actions/workflows/arduino_avr_build.yml/badge.svg)](https://github.com/cyfney/clogger/actions/workflows/arduino_avr_build.yml)
 
 [中文版](README.zh-CN.md)
 
 ## Introduction
 
-The `clog` module is a highly convenient logging utility specifically designed for Arduino projects, catering to both AVR and ESP32 architectures. Its primary goal is to provide users with an effortless way to perform logging tasks on Arduino platforms, making it as easy as using the well-known `printf` function.
+The `clogger` module is a highly convenient logging utility specifically designed for Arduino projects, catering to both AVR and ESP32 architectures. Its primary goal is to provide users with an effortless way to perform logging tasks on Arduino platforms, making it as easy as using the well-known `printf` function.
 
-In traditional Arduino development, logging information with detailed timestamps, file names, line numbers, and function names can be a cumbersome process. However, with the clog module, users can simply include the `clog.h` header file and start using the `CLOG` macro, which mimics the behavior of `printf`. This means that users can easily format and print log messages without having to worry about the underlying complexity of adding timestamps, file information, etc.
+In traditional Arduino development, logging information with detailed timestamps, file names, line numbers, and function names can be a cumbersome process. However, with the clogger module, users can simply include the `clogger.h` header file and start using the `CLOG` macro, which mimics the behavior of `printf`. This means that users can easily format and print log messages without having to worry about the underlying complexity of adding timestamps, file information, etc.
 
-Whether you are debugging your code, monitoring the state of your Arduino project, or simply want to keep track of important events, the `clog` module simplifies the process by providing a straightforward and intuitive logging solution.
+Whether you are debugging your code, monitoring the state of your Arduino project, or simply want to keep track of important events, the `clogger` module simplifies the process by providing a straightforward and intuitive logging solution.
 
 ## Installation
 
-To use the `clog` module in your Arduino project, follow these steps:
+To use the `clogger` module in your Arduino project, follow these steps:
 
 1. Download the Library:
 
-    Download the clog library as a ZIP file from the release page or the source repository.
+    Download the clogger library as a ZIP file from the release page or the source repository.
 
 2. Open Arduino IDE:
 
@@ -27,7 +27,7 @@ To use the `clog` module in your Arduino project, follow these steps:
 3. Install the Library:
 
     - Navigate to Sketch -> Include Library -> Add .ZIP Library... in the Arduino IDE menu.
-    - Select the downloaded clog library ZIP file and click Open.
+    - Select the downloaded clogger library ZIP file and click Open.
     - The Arduino IDE will automatically extract and install the library.
 
 ## Usage
@@ -59,12 +59,18 @@ int value = 10;
 CLOG("value: %d", value);
 ```
 
-## Example
-
-Here is a complete example of using the `clog` module:
+- Log only basic metadata (timestamp, function name, line number):
 
 ```c++
-#include "clog.h"
+CLOG_TRACE();
+```
+
+## Example
+
+Here is a complete example of using the `clogger` module:
+
+```c++
+#include "clogger.h"
 
 void setup() {
   Serial.begin(115200);

@@ -1,7 +1,8 @@
-#include "clog.h"
+#include "clogger.h"
 
 void setup() {
   Serial.begin(115200);
+  CLOG_TRACE();
   CLOG("in setup");
   int value = 10;
   CLOG("value: %d", value);
