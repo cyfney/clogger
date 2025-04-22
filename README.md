@@ -6,11 +6,17 @@
 
 ## Introduction
 
-The `clogger` module is a highly convenient logging utility specifically designed for Arduino projects, catering to both AVR and ESP32 architectures. Its primary goal is to provide users with an effortless way to perform logging tasks on Arduino platforms, making it as easy as using the well-known `printf` function.
+The `clogger` module is a lightweight logging utility designed for Arduino projects, supporting both AVR and ESP32 architectures. It provides a `printf`-like interface with severity-based filtering, timestamps, and metadata (file, line, function).
 
-In traditional Arduino development, logging information with detailed timestamps, file names, line numbers, and function names can be a cumbersome process. However, with the clogger module, users can simply include the `clogger.h` header file and start using the `CLOG` macro, which mimics the behavior of `printf`. This means that users can easily format and print log messages without having to worry about the underlying complexity of adding timestamps, file information, etc.
+## Features
 
-Whether you are debugging your code, monitoring the state of your Arduino project, or simply want to keep track of important events, the `clogger` module simplifies the process by providing a straightforward and intuitive logging solution.
+* **Severity Levels**​​: Verbose, Debug, Info, Warn, Error, Fatal.
+
+​* **​Low Overhead**​​: Compile-time filtering of disabled log levels.
+
+​* **Timestamp Precision**​​: Millisecond-resolution timestamps.
+
+​* **Cross-Platform**​​: Works on AVR (Arduino) and ESP32.
 
 ## Installation
 
@@ -26,91 +32,113 @@ To use the `clogger` module in your Arduino project, follow these steps:
 
 3. Install the Library:
 
-    - Navigate to Sketch -> Include Library -> Add .ZIP Library... in the Arduino IDE menu.
-    - Select the downloaded clogger library ZIP file and click Open.
-    - The Arduino IDE will automatically extract and install the library.
+    * Navigate to Sketch -> Include Library -> Add .ZIP Library... in the Arduino IDE menu.
+    * Select the downloaded clogger library ZIP file and click Open.
+    * The Arduino IDE will automatically extract and install the library.
+
+## Configuration
+
+### Set Log Severity
+
+Define `CLOGGER_SEVERITY` ​​before​​ including `clogger.h` to filter logs by severity:
+
+```c++
+// Choose one severity level (ordered by priority):
+#define CLOGGER_SEVERITY_VERBOSE  // Allow all logs
+#define CLOGGER_SEVERITY_DEBUG
+#define CLOGGER_SEVERITY_INFO     // Default if not specified
+#define CLOGGER_SEVERITY_WARN
+#define CLOGGER_SEVERITY_ERROR
+#define CLOGGER_SEVERITY_FATAL
+#define CLOGGER_SEVERITY_NONE     // Disable all logs
+
+#define CLOGGER_SEVERITY CLOGGER_SEVERITY_DEBUG  // Example: Enable DEBUG+ logs
+#include "clogger.h"
+```
 
 ## Usage
 
-1. Initialization
-
-In the `setup()` function of your Arduino sketch, initialize the serial communication as usual.
+### Basic Logging
 
 ```c++
 void setup() {
   Serial.begin(115200);
+  CLOGI("Initializing...");  // Log with INFO level
+}
+
+void loop() {
+  CLOGD("Sensor value: %d", readSensor());  // DEBUG-level log
 }
 ```
 
-2. Logging Messages
-
-Use the CLOG macro to print log messages. The macro takes a format string and optional arguments, similar to the `printf` function.
-
-- Simple Log Message:
+### Log Severity Macros
 
 ```c++
-CLOG("in setup");
+CLOGV("Verbose trace");    // Detailed tracing (lowest priority)
+CLOGD("Debug data");       // Diagnostic information
+CLOGI("Status update");    // General operational messages
+CLOGW("Potential issue");  // Unexpected but recoverable
+CLOGE("Error occurred");   // Runtime errors requiring attention
+CLOGF("Critical failure"); // Fatal events (highest priority)
 ```
 
-- Log Message with Variables:
+## Log Output Format
+
+Each log line includes structured metadata:
+
+`[HH:MM:SS.mmm] [Severity] [File:Line Function] Message`
+
+​* **Timestamp**​​: HH:MM:SS.mmm (24-hour format, 3-digit milliseconds)
+​​
+
+* **Severity​​**: Single character (V, D, I, W, E, F)
+​​
+* **File**​​: Base filename (without path)
+
+​​* **Line**​​: Source code line number
+​​
+
+* **Function**​​: Calling function name
+
+​​* **Message**​​: User-provided formatted string
+
+## Full Example
 
 ```c++
-int value = 10;
-CLOG("value: %d", value);
-```
-
-- Log only basic metadata (timestamp, function name, line number):
-
-```c++
-CLOG_TRACE();
-```
-
-## Example
-
-Here is a complete example of using the `clogger` module:
-
-```c++
+#define CLOGGER_SEVERITY CLOGGER_SEVERITY_VERBOSE
 #include "clogger.h"
 
 void setup() {
   Serial.begin(115200);
-  CLOG("in setup");
-  int value = 10;
-  CLOG("value: %d", value);
+  int value = 1234;
+  
+  CLOGV("Verbose trace: value=%d", value);  // Visible at VERBOSE
+  CLOGD("Debug data: value=%d", value);     // DEBUG+
+  CLOGI("System status: value=%d", value);  // INFO+
+  CLOGW("Low memory: value=%d", value);     // WARN+
+  CLOGE("Sensor error: code=%d", value);    // ERROR+
 }
 
 void loop() {
-  static unsigned int count = 0;
-  CLOG("loop count: %u", count++);
+  static uint32_t count = 0;
+  CLOGI("Cycle count: %u", count++);  // Log every loop iteration
   delay(1000);
 }
 ```
 
-## Log Output Example
+### Output Example
 
 ```log
-00:00:00.000 sketch.ino:4 setup] in setup
-00:00:00.001 sketch.ino:6 setup] value: 10
-00:00:01.002 sketch.ino:11 loop] loop count: 0
-00:00:02.003 sketch.ino:11 loop] loop count: 1
-00:00:03.004 sketch.ino:11 loop] loop count: 2
+00:00:00.000 V sketch.ino:5 setup] Verbose trace: value=1234
+00:00:00.001 D sketch.ino:6 setup] Debug data: value=1234
+00:00:00.002 I sketch.ino:7 setup] System status: value=1234
+00:00:00.003 W sketch.ino:8 setup] Low memory: value=1234
+00:00:00.004 E sketch.ino:9 setup] Sensor error: code=1234
+00:00:01.005 I sketch.ino:14 loop] Cycle count: 0
+00:00:02.006 I sketch.ino:14 loop] Cycle count: 1
 ...
 ```
 
-### Log Output Format Explanation
-
-The log output format consists of several parts:
-
-- **Timestamp**: The first part of the log message is the timestamp in the format HH:MM:SS.mmm, where HH is the hours (00 - 99), MM is the minutes (00 - 59), SS is the seconds (00 - 59), and mmm is the milliseconds (000 - 999).
-
-- **File Name**: After the timestamp, the file name where the log message is printed is shown, followed by a colon.
-
-- **Line Number**: Next to the file name is the line number in the file where the CLOG macro is called.
-
-- **Function Name**: After the line number, the name of the function where the CLOG macro is called is shown, followed by a closing square bracket.
-
-- **Log Message**: Finally, the log message itself is printed, which can include formatted variables if provided.
-
 ## License
 
-This module is released under the MIT License.
+MIT License. See [LICENSE](LICENSE)

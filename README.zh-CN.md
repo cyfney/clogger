@@ -4,11 +4,17 @@
 
 ## 简介
 
-`clogger`模块是一个专为 Arduino 项目设计的极为便捷的日志记录工具，适用于 AVR 和 ESP32 架构。其主要目的是为用户提供一种在 Arduino 平台上轻松进行日志记录的方法，使用起来就像使用广为人知的 `printf` 函数一样方便。
+`clogger`是一个专为 Arduino 项目设计的轻量级日志库，支持 AVR 和 ESP32 架构。提供类似 printf 的接口，支持按日志等级过滤、毫秒级时间戳和元数据（文件、行号、函数名）。
 
-在传统的 Arduino 开发中，记录带有详细时间戳、文件名、行号和函数名的信息可能是一个繁琐的过程。然而，使用 `clogger` 模块时，用户只需包含 `clogger.h` 头文件，然后就可以开始使用 `CLOG` 宏，该宏的行为类似于 printf。这意味着用户可以轻松地格式化并打印日志消息，而无需担心添加时间戳、文件信息等底层的复杂性。
+## 特性
 
-无论你是在调试代码、监控 Arduino 项目的状态，还是只是想跟踪重要事件，`clogger` 模块都通过提供一个简单直观的日志记录解决方案来简化这个过程。
+* **多日志等级**：Verbose、Debug、Info、Warn、Error、Fatal。
+
+* **低开销**：通过编译时过滤禁用低优先级日志。
+
+* **精确时间戳**：毫秒级时间戳。
+
+* **跨平台**：兼容 AVR (Arduino) 和 ESP32。
 
 ## 安装
 
@@ -24,91 +30,111 @@
 
 3. 安装库文件：
 
-    - 在 Arduino IDE 菜单中，选择 Sketch -> Include Library -> Add .ZIP Library...。
-    - 选择下载的 clogger 库 ZIP 文件，然后点击 Open。
-    - Arduino IDE 会自动解压并安装该库。
+    * 在 Arduino IDE 菜单中，选择 Sketch -> Include Library -> Add .ZIP Library...。
+    * 选择下载的 clogger 库 ZIP 文件，然后点击 Open。
+    * Arduino IDE 会自动解压并安装该库。
 
-## 使用方法
+## 配置
 
-1. 初始化
+### 设置日志等级
 
-    在你的Arduino的`setup()`函数中，像往常一样初始化串口通信。
-
-    ```c++
-    void setup() {
-    Serial.begin(115200);
-    }
-    ```
-
-2. 打印日志消息
-
-    使用 CLOG 宏来打印日志消息。该宏接受一个格式字符串和可选的参数，类似于 printf 函数。
-
-    - 简单的日志消息：
-
-    ```c++
-    CLOG("in setup");
-    ```
-
-    - 带有变量的日志消息：
-
-    ```c++
-    int value = 10;
-    CLOG("value: %d", value);
-    ```
-
-    - 只打印当前时间、函数、行号等信息：
-
-    ```c++
-    CLOG_TRACE();
-    ```
-
-## 示例
-
-以下是使用 clogger 模块的完整示例：
+在包含 `clogger.h` ​​之前​​ 定义 `CLOGGER_SEVERITY` 以过滤日志：
 
 ```c++
+// 可选等级（按优先级升序）：
+#define CLOGGER_SEVERITY_VERBOSE  // 允许所有日志
+#define CLOGGER_SEVERITY_DEBUG
+#define CLOGGER_SEVERITY_INFO     // 未定义时的默认值
+#define CLOGGER_SEVERITY_WARN
+#define CLOGGER_SEVERITY_ERROR
+#define CLOGGER_SEVERITY_FATAL
+#define CLOGGER_SEVERITY_NONE     // 禁用所有日志
+
+#define CLOGGER_SEVERITY CLOGGER_SEVERITY_DEBUG  // 示例：启用DEBUG及以上等级
+#include "clogger.h"
+```
+
+## 使用
+
+### 基础日志
+
+```c++
+void setup() {
+  Serial.begin(115200);
+  CLOGI("Initializing...");  // Log with INFO level
+}
+
+void loop() {
+  CLOGD("Sensor value: %d", readSensor());  // DEBUG-level log
+}
+```
+
+### 日志等级宏
+
+```c++
+CLOGV("Verbose trace");    // 详细跟踪（最低优先级）
+CLOGD("Debug data");       // 调试信息
+CLOGI("Status update");    // 常规运行状态
+CLOGW("Potential issue");  // 可恢复的异常
+CLOGE("Error occurred");   // 需要关注的错误
+CLOGF("Critical failure");  // 导致系统终止的错误（最高优先级）
+```
+
+## 日志格式
+
+每行日志包含结构化元数据：
+
+`[HH:MM:SS.mmm] [等级] [文件:行号 函数名] 消息`
+
+* **​时间戳​**​：HH:MM:SS.mmm（24小时制，3位毫秒）
+
+​​* **等级**​​：单字母表示（V、D、I、W、E、F）
+
+​​* **文件**​​：源文件名（不含路径）
+
+​​* **行号**​​：日志调用处的行号
+
+​​* **函数名**​​：调用函数名称
+
+​​* **消息**​​：用户提供的格式化字符串
+
+## 完整示例
+
+```c++
+#define CLOGGER_SEVERITY CLOGGER_SEVERITY_VERBOSE
 #include "clogger.h"
 
 void setup() {
   Serial.begin(115200);
-  CLOG("in setup");
-  int value = 10;
-  CLOG("value: %d", value);
+  int value = 1234;
+  
+  CLOGV("Verbose trace: value=%d", value);  // Visible at VERBOSE
+  CLOGD("Debug data: value=%d", value);     // DEBUG+
+  CLOGI("System status: value=%d", value);  // INFO+
+  CLOGW("Low memory: value=%d", value);     // WARN+
+  CLOGE("Sensor error: code=%d", value);    // ERROR+
 }
 
 void loop() {
-  static unsigned int count = 0;
-  CLOG("loop count: %u", count++);
+  static uint32_t count = 0;
+  CLOGI("Cycle count: %u", count++);  // Log every loop iteration
   delay(1000);
 }
 ```
 
-## 日志输出示例
+### 输出示例
 
 ```log
-00:00:00.000 sketch.ino:4 setup] in setup
-00:00:00.001 sketch.ino:6 setup] value: 10
-00:00:01.002 sketch.ino:11 loop] loop count: 0
-00:00:02.003 sketch.ino:11 loop] loop count: 1
-00:00:03.004 sketch.ino:11 loop] loop count: 2
+00:00:00.000 V sketch.ino:5 setup] Verbose trace: value=1234
+00:00:00.001 D sketch.ino:6 setup] Debug data: value=1234
+00:00:00.002 I sketch.ino:7 setup] System status: value=1234
+00:00:00.003 W sketch.ino:8 setup] Low memory: value=1234
+00:00:00.004 E sketch.ino:9 setup] Sensor error: code=1234
+00:00:01.005 I sketch.ino:14 loop] Cycle count: 0
+00:00:02.006 I sketch.ino:14 loop] Cycle count: 1
 ...
 ```
 
-## 日志输出格式说明
-
-日志输出格式由几个部分组成：
-
-- **时间戳**：日志消息的第一部分是时间戳，格式为 HH:MM:SS.mmm，其中 HH 是小时（00 - 99），MM 是分钟（00 - 59），SS 是秒（00 - 59），mmm 是毫秒（000 - 999）。
-
-- **文件名**：时间戳之后，显示打印日志消息的文件名，后面跟着一个冒号。
-
-- **行号**：文件名旁边是调用 CLOG 宏的文件中的行号。
-
-- **函数名**：行号之后，显示调用 CLOG 宏的函数名，后面跟着一个右方括号。
-
-- **日志消息**：最后，打印日志消息本身，如果提供了格式化变量，日志消息中可以包含这些变量。
-
 ## 许可证
 
-本模块根据 MIT 许可证 发布。
+MIT 许可证。详见 LICENSE[LICENSE]

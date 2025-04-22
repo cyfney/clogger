@@ -8,14 +8,16 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-struct Clogger {
+class Clogger final {
+ public:
   template <typename T, size_t size>
   static constexpr size_t FileNameOffset(const T (&file_path)[size], size_t i = size - 1) {
     static_assert(size > 1, "");
     return file_path[i] == '/' || file_path[i] == '\\' ? i + 1 : (i == 0 ? 0 : FileNameOffset(file_path, i - 1));
   }
 
-  static void Log(const __FlashStringHelper *file_name,
+  static void Log(int severity,
+                  const __FlashStringHelper *file_name,
                   const size_t file_name_begin,
                   const size_t line_num,
                   const char *function,
@@ -35,7 +37,9 @@ struct Clogger {
                minutes,
                seconds,
                millis);
-    Serial.print(time_str);
+    Serial.write(time_str, sizeof(time_str) - 1);
+    Serial.print(SeverityToChar(severity));
+    Serial.print(' ');
     Serial.print(reinterpret_cast<const __FlashStringHelper *>(reinterpret_cast<PGM_P>(file_name) + file_name_begin));
     Serial.print(':');
     Serial.print(line_num);
@@ -49,21 +53,81 @@ struct Clogger {
 
     va_list args;
     va_start(args, fmt);
-    const auto size = vsnprintf_P(nullptr, 0, reinterpret_cast<const char *>(fmt), args);
+    const auto length = vsnprintf_P(nullptr, 0, reinterpret_cast<const char *>(fmt), args);
     va_end(args);
 
-    char *buffer = new char[size + 1];
+    char *buffer = new char[length + 1];
+    if (buffer == nullptr) {
+      abort();
+    }
 
     va_start(args, fmt);
-    vsnprintf_P(buffer, size + 1, reinterpret_cast<const char *>(fmt), args);
+    vsnprintf_P(buffer, length + 1, reinterpret_cast<const char *>(fmt), args);
     va_end(args);
-    Serial.println(buffer);
+    Serial.write(buffer, length);
     delete[] buffer;
+  }
+
+ private:
+  static char SeverityToChar(const int severity) {
+    switch (severity) {
+      case CLOGGER_SEVERITY_VERBOSE:
+        return 'V';
+      case CLOGGER_SEVERITY_DEBUG:
+        return 'D';
+      case CLOGGER_SEVERITY_INFO:
+        return 'I';
+      case CLOGGER_SEVERITY_WARN:
+        return 'W';
+      case CLOGGER_SEVERITY_ERROR:
+        return 'E';
+      case CLOGGER_SEVERITY_FATAL:
+        return 'F';
+    }
+    return 'X';
   }
 };  // namespace clog
 
-#define CLOG(fmt, ...) Clogger::Log(F(__FILE__), Clogger::FileNameOffset(__FILE__), __LINE__, __FUNCTION__, F("" fmt), ##__VA_ARGS__)
+#if CLOGGER_SEVERITY <= CLOGGER_SEVERITY_VERBOSE
+#define CLOGV(fmt, ...) \
+  Clogger::Log(CLOGGER_SEVERITY_VERBOSE, F(__FILE__), Clogger::FileNameOffset(__FILE__), __LINE__, __FUNCTION__, F("" fmt "\n"), ##__VA_ARGS__)
+#else
+#define CLOGV(fmt, ...)
+#endif
 
-#define CLOG_TRACE() Clogger::Log(F(__FILE__), Clogger::FileNameOffset(__FILE__), __LINE__, __FUNCTION__, nullptr)
+#if CLOGGER_SEVERITY <= CLOGGER_SEVERITY_DEBUG
+#define CLOGD(fmt, ...) \
+  Clogger::Log(CLOGGER_SEVERITY_DEBUG, F(__FILE__), Clogger::FileNameOffset(__FILE__), __LINE__, __FUNCTION__, F("" fmt "\n"), ##__VA_ARGS__)
+#else
+#define CLOGD(fmt, ...)
+#endif
+
+#if CLOGGER_SEVERITY <= CLOGGER_SEVERITY_INFO
+#define CLOGI(fmt, ...) \
+  Clogger::Log(CLOGGER_SEVERITY_INFO, F(__FILE__), Clogger::FileNameOffset(__FILE__), __LINE__, __FUNCTION__, F("" fmt "\n"), ##__VA_ARGS__)
+#else
+#define CLOGI(fmt, ...)
+#endif
+
+#if CLOGGER_SEVERITY <= CLOGGER_SEVERITY_WARN
+#define CLOGW(fmt, ...) \
+  Clogger::Log(CLOGGER_SEVERITY_WARN, F(__FILE__), Clogger::FileNameOffset(__FILE__), __LINE__, __FUNCTION__, F("" fmt "\n"), ##__VA_ARGS__)
+#else
+#define CLOGW(fmt, ...)
+#endif
+
+#if CLOGGER_SEVERITY <= CLOGGER_SEVERITY_ERROR
+#define CLOGE(fmt, ...) \
+  Clogger::Log(CLOGGER_SEVERITY_ERROR, F(__FILE__), Clogger::FileNameOffset(__FILE__), __LINE__, __FUNCTION__, F("" fmt "\n"), ##__VA_ARGS__)
+#else
+#define CLOGE(fmt, ...)
+#endif
+
+#if CLOGGER_SEVERITY <= CLOGGER_SEVERITY_FATAL
+#define CLOGF(fmt, ...) \
+  Clogger::Log(CLOGGER_SEVERITY_FATAL, F(__FILE__), Clogger::FileNameOffset(__FILE__), __LINE__, __FUNCTION__, F("" fmt "\n"), ##__VA_ARGS__)
+#else
+#define CLOGF(fmt, ...)
+#endif
 
 #endif
