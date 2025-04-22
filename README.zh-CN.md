@@ -1,4 +1,4 @@
-# CLOG
+# Clogger
 
 [![Arduino AVR Build](https://github.com/cyfney/clogger/actions/workflows/arduino_avr_build.yml/badge.svg)](https://github.com/cyfney/clogger/actions/workflows/arduino_avr_build.yml) [![Arduino AVR Build](https://github.com/cyfney/clogger/actions/workflows/arduino_avr_build.yml/badge.svg)](https://github.com/cyfney/clogger/actions/workflows/arduino_avr_build.yml)
 
@@ -8,13 +8,13 @@
 
 ## 特性
 
-* **多日志等级**：Verbose、Debug、Info、Warn、Error、Fatal。
+* **多日志等级** ：Verbose、Debug、Info、Warn、Error、Fatal。
 
-* **低开销**：通过编译时过滤禁用低优先级日志。
+* **低开销** ：通过编译时过滤禁用低优先级日志。
 
-* **精确时间戳**：毫秒级时间戳。
+* **精确时间戳** ：毫秒级时间戳。
 
-* **跨平台**：兼容 AVR (Arduino) 和 ESP32。
+* **跨平台** ：兼容 AVR (Arduino) 和 ESP32。
 
 ## 安装
 
@@ -38,7 +38,7 @@
 
 ### 设置日志等级
 
-在包含 `clogger.h` ​​之前​​ 定义 `CLOGGER_SEVERITY` 以过滤日志：
+在包含 `clogger.h`之前​​定义 `CLOGGER_SEVERITY` 以过滤日志：
 
 ```c++
 // 可选等级（按优先级升序）：
@@ -86,17 +86,17 @@ CLOGF("Critical failure");  // 导致系统终止的错误（最高优先级）
 
 `[HH:MM:SS.mmm] [等级] [文件:行号 函数名] 消息`
 
-* **​时间戳​**​：HH:MM:SS.mmm（24小时制，3位毫秒）
+* **时间戳**：HH:MM:SS.mmm（24小时制，3位毫秒）
 
-​​* **等级**​​：单字母表示（V、D、I、W、E、F）
+* **等级**：单字母表示（V、D、I、W、E、F）
 
-​​* **文件**​​：源文件名（不含路径）
+* **文件**：源文件名（不含路径）
 
-​​* **行号**​​：日志调用处的行号
+* **行号**：日志调用处的行号
 
-​​* **函数名**​​：调用函数名称
+* **函数名**：调用函数名称
 
-​​* **消息**​​：用户提供的格式化字符串
+* **消息**：用户提供的格式化字符串
 
 ## 完整示例
 

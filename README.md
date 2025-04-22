@@ -1,4 +1,4 @@
-# CLOG
+# Clogger
 
 [![Arduino AVR Build](https://github.com/cyfney/clogger/actions/workflows/arduino_avr_build.yml/badge.svg)](https://github.com/cyfney/clogger/actions/workflows/arduino_avr_build.yml) [![Arduino AVR Build](https://github.com/cyfney/clogger/actions/workflows/arduino_avr_build.yml/badge.svg)](https://github.com/cyfney/clogger/actions/workflows/arduino_avr_build.yml)
 
@@ -10,13 +10,13 @@ The `clogger` module is a lightweight logging utility designed for Arduino proje
 
 ## Features
 
-* **Severity Levels**​​: Verbose, Debug, Info, Warn, Error, Fatal.
+* **Severity Levels**: Verbose, Debug, Info, Warn, Error, Fatal.
 
-​* **​Low Overhead**​​: Compile-time filtering of disabled log levels.
+* **Low Overhead**: Compile-time filtering of disabled log levels.
 
-​* **Timestamp Precision**​​: Millisecond-resolution timestamps.
+* **Timestamp Precision**: Millisecond-resolution timestamps.
 
-​* **Cross-Platform**​​: Works on AVR (Arduino) and ESP32.
+* **Cross-Platform**: Works on AVR (Arduino) and ESP32.
 
 ## Installation
 
@@ -40,7 +40,7 @@ To use the `clogger` module in your Arduino project, follow these steps:
 
 ### Set Log Severity
 
-Define `CLOGGER_SEVERITY` ​​before​​ including `clogger.h` to filter logs by severity:
+Define `CLOGGER_SEVERITY` before including `clogger.h` to filter logs by severity:
 
 ```c++
 // Choose one severity level (ordered by priority):
@@ -88,19 +88,17 @@ Each log line includes structured metadata:
 
 `[HH:MM:SS.mmm] [Severity] [File:Line Function] Message`
 
-​* **Timestamp**​​: HH:MM:SS.mmm (24-hour format, 3-digit milliseconds)
-​​
+* **Timestamp**: HH:MM:SS.mmm (24-hour format, 3-digit milliseconds)
 
-* **Severity​​**: Single character (V, D, I, W, E, F)
-​​
-* **File**​​: Base filename (without path)
+* **Severity**: Single character (V, D, I, W, E, F)
 
-​​* **Line**​​: Source code line number
-​​
+* **File**: Base filename (without path)
 
-* **Function**​​: Calling function name
+* **Line**: Source code line number
 
-​​* **Message**​​: User-provided formatted string
+* **Function**: Calling function name
+
+* **Message**: User-provided formatted string
 
 ## Full Example
 
