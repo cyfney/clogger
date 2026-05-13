@@ -25,19 +25,25 @@ namespace clogger {
 class Logger final {
  public:
   template <typename T, size_t size>
-  static constexpr size_t FileNameOffset(const T (&file_path)[size], size_t i = size) {
+  static constexpr size_t FileNameOffset(const T (&file_path)[size], size_t i = size) noexcept {
     return (i == 0) ? 0 : (file_path[i - 1] == '/' || file_path[i - 1] == '\\') ? i : FileNameOffset(file_path, i - 1);
   }
 
-  static std::array<char, 13> GetTimeStr() {
-    std::array<char, 13> result = {};
+  static std::array<char, 13> GetTimeStr() noexcept {
+    constexpr uint64_t kHundredHoursMs = 100ULL * 60 * 60 * 1000;
 
-    const auto total_ms = pdTICKS_TO_MS(xTaskGetTickCount());
+    std::array<char, 13> result{};
 
-    const int hours = total_ms / 3600000 % 100;
-    const int minutes = total_ms / 60000 % 60;
-    const int seconds = total_ms / 1000 % 60;
-    const int milliseconds = total_ms % 1000;
+    const uint32_t milliseconds_in_100h = static_cast<uint32_t>(pdTICKS_TO_MS(xTaskGetTickCount()) % kHundredHoursMs);
+
+    const uint32_t milliseconds = milliseconds_in_100h % 1000;
+    const uint32_t total_seconds = milliseconds_in_100h / 1000;
+
+    const uint32_t seconds = total_seconds % 60;
+    const uint32_t total_minutes = total_seconds / 60;
+
+    const uint32_t minutes = total_minutes % 60;
+    const uint32_t hours = total_minutes / 60;
 
     result[0] = '0' + hours / 10;
     result[1] = '0' + hours % 10;
